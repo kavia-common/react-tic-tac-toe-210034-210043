@@ -85,7 +85,7 @@ function useGame(): {
   };
 
   // PUBLIC_INTERFACE
-  const handleReset = () => {
+  const handleReset = (reason?: string) => {
     const before = state;
     const afterBoard = createEmptyBoard();
     const afterHistory: number[] = [];
@@ -96,6 +96,7 @@ function useGame(): {
       userId: currentPlayer,
       action: "RESET",
       timestamp: new Date().toISOString(),
+      payload: reason ? { reason } : undefined,
       before,
       after: {
         board: afterBoard,
@@ -392,7 +393,9 @@ export default function App() {
 
   const onResetWrapped = () =>
     tryAction(() => {
-      handleReset();
+      // Optional reason hook; for now we don't prompt, but support is wired.
+      const reason: string | undefined = undefined;
+      handleReset(reason);
       // After reset, focus New Game button, else first square as fallback
       setTimeout(() => {
         if (!newGameBtnRef.current) {
