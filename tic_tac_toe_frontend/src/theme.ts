@@ -30,6 +30,13 @@ export type Theme = {
     background: string;
     surface: string;
     text: string;
+    winAccent?: string;
+  };
+  shadows?: {
+    lg?: string;
+  };
+  effects?: {
+    focusRing?: string;
   };
 };
 
@@ -45,6 +52,13 @@ export const theme: Theme = {
     background: "#f9fafb",
     surface: "#ffffff",
     text: "#111827",
+    winAccent: "#16a34a", // green accent for winning line
+  },
+  shadows: {
+    lg: "0 12px 28px rgba(0,0,0,0.16)",
+  },
+  effects: {
+    focusRing: "3px solid #06b6d4", // cyan focus ring
   },
 };
 

@@ -60,6 +60,33 @@ export function calculateWinner(board: Board): Player | null {
   return null;
 }
 
+/**
+ * PUBLIC_INTERFACE
+ */
+export function getWinningLine(board: Board): number[] | null {
+  /**
+   * Return the indices [a,b,c] of the winning line, or null if none.
+   * Useful for visually highlighting the winning cells.
+   */
+  const lines: number[][] = [
+    [0, 1, 2], // rows
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6], // cols
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8], // diagonals
+    [2, 4, 6],
+  ];
+  for (const [a, b, c] of lines) {
+    const va = board[a];
+    if (va && va === board[b] && va === board[c]) {
+      return [a, b, c];
+    }
+  }
+  return null;
+}
+
 // PUBLIC_INTERFACE
 export function isDraw(board: Board): boolean {
   /** True if all cells are filled and there is no winner. */

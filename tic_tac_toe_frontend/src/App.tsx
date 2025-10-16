@@ -188,10 +188,16 @@ function StatusBar({
           font-size: 1.25rem;
           font-weight: 700;
           margin-bottom: 4px;
+          transition: color 160ms ease;
         }
         .sub {
           color: ${theme.colors.secondary};
           font-size: 0.95rem;
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .status {
+            transition: none;
+          }
         }
       `}</style>
     </div>
@@ -204,18 +210,19 @@ function Controls({
   canUndo,
   onToggleHistory,
   historyVisible,
+  newGameRef,
 }: {
   onReset: () => void;
   onUndo: () => void;
   canUndo: boolean;
   onToggleHistory: () => void;
   historyVisible: boolean;
+  newGameRef?: React.Ref<HTMLButtonElement>;
 }) {
-  const baseBtn =
-    "ctrl-btn";
+  const baseBtn = "ctrl-btn";
   return (
     <div className="controls">
-      <button className={baseBtn} onClick={onReset} aria-label="Start a new game">
+      <button ref={newGameRef} className={baseBtn} onClick={onReset} aria-label="Start a new game">
         New Game
       </button>
       <button
@@ -258,7 +265,7 @@ function Controls({
           box-shadow: 0 12px 26px rgba(59,130,246,0.35);
         }
         .ctrl-btn:focus-visible {
-          outline: 3px solid ${theme.colors.success};
+          outline: ${theme.effects?.focusRing ?? "3px solid " + theme.colors.success};
           outline-offset: 2px;
         }
         .btn-disabled, .ctrl-btn:disabled {
@@ -266,6 +273,15 @@ function Controls({
           cursor: not-allowed;
           box-shadow: none;
           transform: none;
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .ctrl-btn {
+            transition: none;
+          }
+          .ctrl-btn:hover {
+            transform: none;
+            box-shadow: 0 10px 20px rgba(59,130,246,0.2);
+          }
         }
       `}</style>
     </div>
@@ -315,6 +331,15 @@ export default function App() {
   const [historyVisible, setHistoryVisible] = useState(false);
   const [toast, setToast] = useState<Toast>(null);
 
+  const statusRef = useRef<HTMLDivElement | null>(null);
+  const toastRef = useRef<HTMLDivElement | null>(null);
+  const historyTitleRef = useRef<HTMLDivElement | null>(null);
+  const newGameBtnRef = useRef<HTMLButtonElement | null>(null);
+  const firstSquareRef = useRef<HTMLButtonElement | null>(null);
+
+  const winningLine = useMemo(() => getWinningLine(state.board), [state.board]);
+  const gameOver = !!state.winner || state.isDraw;
+
   const tryAction = (fn: () => void) => {
     try {
       fn();
@@ -322,8 +347,60 @@ export default function App() {
     } catch (e: unknown) {
       const message = e instanceof Error ? e.message : "An unexpected error occurred.";
       setToast({ type: "error", message });
+      // move focus to toast region
+      requestAnimationFrame(() => {
+        toastRef.current?.focus();
+      });
     }
   };
+
+  // First-run hint banner (session)
+  const [showHint, setShowHint] = useState<boolean>(() => {
+    try {
+      return sessionStorage.getItem("ttt_hint_dismissed") !== "1";
+    } catch {
+      return true;
+    }
+  });
+  const dismissHint = () => {
+    setShowHint(false);
+    try {
+      sessionStorage.setItem("ttt_hint_dismissed", "1");
+    } catch {
+      // ignore if not available
+    }
+  };
+
+  // Move focus to status when game ends
+  useEffect(() => {
+    if (gameOver) {
+      requestAnimationFrame(() => {
+        statusRef.current?.focus();
+      });
+    }
+  }, [gameOver]);
+
+  // Focus management on history toggle
+  useEffect(() => {
+    if (historyVisible) {
+      requestAnimationFrame(() => {
+        historyTitleRef.current?.focus();
+      });
+    }
+  }, [historyVisible]);
+
+  const onResetWrapped = () =>
+    tryAction(() => {
+      handleReset();
+      // After reset, focus New Game button, else first square as fallback
+      setTimeout(() => {
+        if (!newGameBtnRef.current) {
+          firstSquareRef.current?.focus();
+        } else {
+          newGameBtnRef.current.focus();
+        }
+      }, 0);
+    });
 
   return (
     <div className="app-root">
@@ -333,25 +410,49 @@ export default function App() {
           <p className="subtitle">Local two-player • Ocean Professional</p>
         </header>
 
-        <StatusBar
-          player={state.currentPlayer}
-          winner={state.winner}
-          draw={state.isDraw}
-          moveCount={state.history.length}
-        />
+        {showHint && (
+          <div className="hint" role="note" aria-live="polite">
+            <div className="hint-content">
+              Tip: Use keyboard to navigate squares and press Enter/Space to play. You can Undo or start a New Game anytime.
+            </div>
+            <button className="hint-dismiss" onClick={dismissHint} aria-label="Dismiss hint">
+              Dismiss
+            </button>
+          </div>
+        )}
+
+        <div
+          className="status-wrap"
+          ref={statusRef}
+          tabIndex={-1}
+          aria-live="polite"
+          aria-atomic="true"
+          style={{ outline: "none" }}
+        >
+          <StatusBar
+            player={state.currentPlayer}
+            winner={state.winner}
+            draw={state.isDraw}
+            moveCount={state.history.length}
+          />
+        </div>
 
         <div className="board-wrap">
           <Board
             board={state.board}
             onPlay={(i) => tryAction(() => handlePlay(i))}
-            disabled={!!state.winner || state.isDraw}
+            disabled={gameOver}
+            winningLine={winningLine}
+            firstSquareRef={firstSquareRef}
           />
         </div>
 
         {toast && (
           <div
+            ref={toastRef}
             role="status"
             aria-live="polite"
+            tabIndex={-1}
             className={cx("toast", toast.type === "error" && "toast-error")}
           >
             {toast.message}
@@ -359,14 +460,27 @@ export default function App() {
         )}
 
         <Controls
-          onReset={() => tryAction(handleReset)}
+          onReset={onResetWrapped}
           onUndo={() => tryAction(handleUndo)}
           canUndo={state.history.length > 0}
           onToggleHistory={() => setHistoryVisible((v) => !v)}
           historyVisible={historyVisible}
+          newGameRef={newGameBtnRef}
         />
 
-        {historyVisible && <HistoryList history={state.history} />}
+        {historyVisible && (
+          <div className="history" aria-live="polite">
+            <div
+              className="history-title"
+              ref={historyTitleRef}
+              tabIndex={-1}
+              style={{ outline: "none", fontWeight: 700, marginTop: 12, marginBottom: 8 }}
+            >
+              Move History
+            </div>
+            <HistoryList history={state.history} />
+          </div>
+        )}
       </main>
 
       <style>{`
@@ -397,6 +511,29 @@ export default function App() {
           margin-top: 4px;
           margin-bottom: 0;
         }
+        .hint {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 8px;
+          background: #ecfeff;
+          color: #0e7490;
+          border: 1px solid #a5f3fc;
+          padding: 10px 12px;
+          border-radius: 10px;
+          margin: 8px 0 12px;
+        }
+        .hint .hint-dismiss {
+          background: transparent;
+          border: 1px solid #67e8f9;
+          color: #0e7490;
+          border-radius: 8px;
+          padding: 6px 10px;
+          cursor: pointer;
+        }
+        .hint .hint-dismiss:hover {
+          background: #cffafe;
+        }
         .board-wrap {
           display: flex;
           justify-content: center;
@@ -420,6 +557,12 @@ export default function App() {
         @media (max-width: 480px) {
           .container {
             max-width: 360px;
+          }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .hint, .toast {
+            transition: none;
           }
         }
       `}</style>

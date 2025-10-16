@@ -7,20 +7,45 @@ export function Board({
   board,
   onPlay,
   disabled,
+  winningLine,
+  firstSquareRef,
 }: {
   board: SquareValue[];
   onPlay: (index: number) => void;
   disabled?: boolean;
+  winningLine?: number[] | null;
+  firstSquareRef?: React.Ref<HTMLButtonElement>;
 }) {
   /** Board renders a 3x3 grid of Square components. */
+  const winSet = new Set(winningLine || []);
+  const hasWin = (winningLine && winningLine.length === 3) || false;
+
   return (
     <div className={cx("board-container")}>
       <div className="grid" role="grid" aria-label="Tic Tac Toe board">
-        {board.map((value, i) => (
-          <div role="gridcell" key={i}>
-            <Square value={value} index={i} onClick={onPlay} disabled={disabled} />
-          </div>
-        ))}
+        {/* Offscreen description for winning line association */}
+        {hasWin && (
+          <p id="winning-line-desc" className="sr-only">
+            Winning line highlighted on cells {String(winningLine!.map((n) => n + 1).join(", "))}
+          </p>
+        )}
+        {board.map((value, i) => {
+          const isWinning = hasWin && winSet.has(i);
+          const describedBy = isWinning ? "winning-line-desc" : undefined;
+          return (
+            <div role="gridcell" key={i}>
+              <Square
+                refProp={i === 0 ? firstSquareRef : undefined}
+                value={value}
+                index={i}
+                onClick={onPlay}
+                disabled={disabled}
+                isWinning={isWinning}
+                ariaDescribedBy={describedBy}
+              />
+            </div>
+          );
+        })}
       </div>
       <style>{`
         .board-container {

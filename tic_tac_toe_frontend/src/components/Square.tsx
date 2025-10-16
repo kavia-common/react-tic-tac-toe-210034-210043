@@ -9,33 +9,41 @@ export function Square({
   onClick,
   index,
   disabled,
+  isWinning,
+  ariaDescribedBy,
+  refProp,
 }: {
   value: SquareValue;
   onClick: (index: number) => void;
   index: number;
   disabled?: boolean;
+  isWinning?: boolean;
+  ariaDescribedBy?: string;
+  refProp?: React.Ref<HTMLButtonElement>;
 }) {
   /** Square button representing a single cell on the Tic Tac Toe board. */
   const label =
     value === ""
       ? `Place mark in cell ${index + 1}`
-      : `Cell ${index + 1} contains ${value}`;
+      : `Cell ${index + 1} contains ${value}${isWinning ? ", part of the winning line" : ""}`;
 
-  const base =
-    "square-btn";
+  const base = "square-btn";
   const classes = cx(
     base,
     value === "X" && "square-x",
     value === "O" && "square-o",
-    disabled && "square-disabled"
+    disabled && "square-disabled",
+    isWinning && "square-winning"
   );
 
   return (
     <button
+      ref={refProp}
       type="button"
       className={classes}
       aria-label={label}
       aria-pressed={value !== ""}
+      aria-describedby={ariaDescribedBy}
       onClick={() => onClick(index)}
       disabled={disabled}
     >
@@ -43,8 +51,13 @@ export function Square({
       <span className="square-value" aria-hidden="true">
         {value}
       </span>
+      {/* Non-color winning indicator: trophy icon emoji for additional cue */}
+      {isWinning && (
+        <span className="win-icon" aria-hidden="true" title="Winning cell">🏆</span>
+      )}
       <style>{`
         .square-btn {
+          position: relative;
           width: 96px;
           height: 96px;
           display: flex;
@@ -52,7 +65,7 @@ export function Square({
           justify-content: center;
           border-radius: 16px;
           background: ${theme.colors.surface};
-          border: 1px solid rgba(0,0,0,0.06);
+          border: 2px solid rgba(0,0,0,0.06);
           box-shadow: 0 8px 20px rgba(0,0,0,0.06);
           color: ${theme.colors.text};
           font-weight: 700;
@@ -66,7 +79,7 @@ export function Square({
           border-color: ${theme.colors.primary};
         }
         .square-btn:focus-visible {
-          outline: 3px solid ${theme.colors.primary};
+          outline: ${theme.effects?.focusRing ?? "3px solid " + theme.colors.primary};
           outline-offset: 2px;
         }
         .square-btn:disabled {
@@ -82,12 +95,36 @@ export function Square({
         .square-value {
           line-height: 1;
         }
+        .square-winning {
+          border-color: ${theme.colors.winAccent ?? "#16a34a"};
+          box-shadow: 0 0 0 3px rgba(22,163,74,0.15), ${theme.shadows?.lg ?? "0 12px 28px rgba(0,0,0,0.16)"};
+        }
+        .square-winning .square-value {
+          text-shadow: 0 1px 0 rgba(0,0,0,0.08);
+        }
+        .win-icon {
+          position: absolute;
+          top: 6px;
+          right: 8px;
+          font-size: 0.9rem;
+          filter: drop-shadow(0 1px 1px rgba(0,0,0,0.25));
+        }
 
         @media (max-width: 480px) {
           .square-btn {
             width: 80px;
             height: 80px;
             font-size: 1.75rem;
+          }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .square-btn {
+            transition: none;
+          }
+          .square-btn:hover:not(:disabled) {
+            transform: none;
+            box-shadow: 0 10px 20px rgba(59,130,246,0.12);
           }
         }
       `}</style>
