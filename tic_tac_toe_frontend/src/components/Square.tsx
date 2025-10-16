@@ -12,6 +12,9 @@ export function Square({
   isWinning,
   ariaDescribedBy,
   refProp,
+  // a11y enhancements
+  tabIndexOverride,
+  onKeyDownOverride,
 }: {
   value: SquareValue;
   onClick: (index: number) => void;
@@ -20,6 +23,9 @@ export function Square({
   isWinning?: boolean;
   ariaDescribedBy?: string;
   refProp?: React.Ref<HTMLButtonElement>;
+  // Roving tabindex and keyboard handling (controlled by Board)
+  tabIndexOverride?: number;
+  onKeyDownOverride?: (e: React.KeyboardEvent<HTMLButtonElement>) => void;
 }) {
   /** Square button representing a single cell on the Tic Tac Toe board. */
   const label =
@@ -45,6 +51,8 @@ export function Square({
       aria-pressed={value !== ""}
       aria-describedby={ariaDescribedBy}
       onClick={() => onClick(index)}
+      onKeyDown={onKeyDownOverride}
+      tabIndex={typeof tabIndexOverride === "number" ? tabIndexOverride : 0}
       disabled={disabled}
     >
       <span className="sr-only">{label}</span>
@@ -79,8 +87,10 @@ export function Square({
           border-color: ${theme.colors.primary};
         }
         .square-btn:focus-visible {
-          outline: ${theme.effects?.focusRing ?? "3px solid " + theme.colors.primary};
-          outline-offset: 2px;
+          /* stronger, higher-contrast focus ring using theme token */
+          outline: ${theme.effects?.focusRing ?? "3px solid " + theme.colors.success};
+          outline-offset: 3px;
+          box-shadow: 0 0 0 3px rgba(6,182,212,0.25);
         }
         .square-btn:disabled {
           opacity: 0.6;

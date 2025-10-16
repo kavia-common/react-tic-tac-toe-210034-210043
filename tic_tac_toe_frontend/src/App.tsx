@@ -1,7 +1,7 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useRef, useEffect, useState } from "react";
 import { theme, cx } from "./theme";
 import Board from "./components/Board";
-import { createEmptyBoard, calculateWinner, getNextPlayer, isDraw, makeMove, GameState } from "./game/logic";
+import { createEmptyBoard, calculateWinner, getNextPlayer, isDraw, makeMove, GameState, getWinningLine } from "./game/logic";
 import { logAction } from "./utils/audit";
 
 //
@@ -266,7 +266,8 @@ function Controls({
         }
         .ctrl-btn:focus-visible {
           outline: ${theme.effects?.focusRing ?? "3px solid " + theme.colors.success};
-          outline-offset: 2px;
+          outline-offset: 3px;
+          box-shadow: 0 0 0 3px rgba(6,182,212,0.25);
         }
         .btn-disabled, .ctrl-btn:disabled {
           opacity: 0.6;
@@ -450,8 +451,7 @@ export default function App() {
         {toast && (
           <div
             ref={toastRef}
-            role="status"
-            aria-live="polite"
+            role="alert"
             tabIndex={-1}
             className={cx("toast", toast.type === "error" && "toast-error")}
           >
