@@ -1,7 +1,9 @@
 declare module "react" {
   // Minimal React typings to satisfy TypeScript generics and JSX in our codebase.
   // This is a lightweight shim and should be removed once @types/react is installed.
-
+  // Note: When @types/react is present, Node/TS resolution prefers types from node_modules/@types.
+  // These shims are minimal to avoid conflicts.
+  
   export type ReactNode = any;
 
   export interface MutableRefObject<T> { current: T | null; }

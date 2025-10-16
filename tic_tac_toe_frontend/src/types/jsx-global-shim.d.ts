@@ -6,7 +6,8 @@ declare global {
     interface IntrinsicClassAttributes<T> {
       ref?: any;
     }
-    // Minimal catch-all mapping so any HTML tag is accepted by the compiler
+    // Minimal catch-all mapping so any HTML tag is accepted by the compiler.
+    // Real @types/react will supersede these definitions automatically.
     interface IntrinsicElements {
       [elemName: string]: any;
     }

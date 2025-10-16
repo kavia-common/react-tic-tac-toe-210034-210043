@@ -1,5 +1,7 @@
 declare global {
   namespace React {
+    // Namespace shim to satisfy references like React.Ref<> without full @types.
+    // Will be shadowed by @types/react when installed.
     type ReactNode = any;
     interface MutableRefObject<T> { current: T | null; }
     type Ref<T> = ((instance: T | null) => void) | MutableRefObject<T> | null;

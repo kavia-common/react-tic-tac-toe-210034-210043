@@ -34,7 +34,9 @@ export default [
         beforeEach: true,
         afterAll: true,
         afterEach: true,
-        jest: true
+        jest: true,
+        // RTL and jest-dom helpers commonly used in tests
+        screen: true
       }
     },
     rules: {

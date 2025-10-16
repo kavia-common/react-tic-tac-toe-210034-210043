@@ -12,7 +12,8 @@
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
+    // Keep lightweight type shims, but prefer real @types when present
     "typeRoots": ["./src/types", "./node_modules/@types"]
   },
-  "include": ["src", "src/types/**/*.d.ts"]
+  "include": ["src"]
 }

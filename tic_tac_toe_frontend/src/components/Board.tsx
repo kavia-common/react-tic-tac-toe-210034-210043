@@ -23,11 +23,11 @@ export function Board({
   // Roving tabindex: track focused cell index
   const [focusedIndex, setFocusedIndex] = useState<number>(0);
 
-  // refs for all 9 squares to move focus programmatically
-  const squareRefs = useRef<Array<HTMLButtonElement | null>>([]);
-  if (squareRefs.current.length !== 9) {
-    squareRefs.current = Array(9).fill(null);
-  }
+  // refs for all 9 squares to move focus programmatically (initialize with fixed length)
+  const squareRefs = useRef<Array<HTMLButtonElement | null>>(
+    // Pre-initialize to length 9 to avoid nullability warnings and reassignment
+    Array<HTMLButtonElement | null>(9).fill(null)
+  );
 
   // clamp focus to first enabled index if current is disabled due to game over (we still keep focus position but will not move into disabled squares)
   const isCellDisabled = useCallback(
@@ -85,7 +85,8 @@ export function Board({
       if (!isCellDisabled(nextIndex)) {
         setFocusedIndex(nextIndex);
         requestAnimationFrame(() => {
-          squareRefs.current[nextIndex]?.focus();
+          const btn = squareRefs.current && squareRefs.current[nextIndex];
+          btn?.focus();
         });
       }
     },
@@ -132,7 +133,10 @@ export function Board({
                   <Square
                     // wire up ref for programmatic focus
                     refProp={(el) => {
-                      squareRefs.current[i] = el;
+                      const arr = squareRefs.current;
+                      if (arr) {
+                        arr[i] = el;
+                      }
                       // Also pass through the external firstSquareRef for i=0
                       if (i === 0 && typeof firstSquareRef === "function") {
                         firstSquareRef(el);
