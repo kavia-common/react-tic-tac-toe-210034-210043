@@ -393,8 +393,27 @@ export default function App() {
 
   const onResetWrapped = () =>
     tryAction(() => {
-      // Optional reason hook; for now we don't prompt, but support is wired.
-      const reason: string | undefined = undefined;
+      // Optional reason hook; not prompting UI by default to keep UX simple,
+      // but we support passing a reason if available (e.g., from future dialog).
+      let reason: string | undefined = undefined;
+      // Example stub: capture reason from a stored value (no-op by default)
+      try {
+        // reserved for potential future integration (e.g., sessionStorage flag)
+        const planned = undefined as unknown as string | undefined;
+        reason = planned && String(planned).trim() ? String(planned) : undefined;
+      } catch (e) {
+        // If future capture fails, record an ERROR with message (state unchanged)
+        const message = "Failed to capture reset reason.";
+        logAction({
+          userId: state.currentPlayer,
+          action: "ERROR",
+          timestamp: new Date().toISOString(),
+          message,
+          before: state,
+          after: state,
+        });
+      }
+
       handleReset(reason);
       // After reset, focus New Game button, else first square as fallback
       setTimeout(() => {

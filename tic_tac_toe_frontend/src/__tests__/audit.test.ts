@@ -131,5 +131,12 @@ describe("audit", () => {
     expect(reset.before).toEqual(s2);
     expect(reset.after).toEqual(s3);
     expect(reset.payload).toEqual({ reason });
+
+    // Sanity: every entry has id and sessionId populated
+    for (const e of trail) {
+      expect(e.id).toMatch(/^[0-9a-f-]{36}$/i);
+      expect(typeof e.sessionId).toBe("string");
+      expect(e.sessionId.length).toBeGreaterThan(0);
+    }
   });
 });

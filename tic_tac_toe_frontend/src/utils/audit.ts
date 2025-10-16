@@ -67,13 +67,13 @@ function _uuidV4(): string {
 
 // PUBLIC_INTERFACE
 export function generateId(): string {
-  /** Return a UUID-like identifier for audit entries and correlation. */
+  /** This is a public function. Return a UUID-like identifier for audit entries and correlation. */
   return _uuidV4();
 }
 
 // PUBLIC_INTERFACE
 export function getSessionId(): string {
-  /** Return a memoized UUID-like id unique to this browser session. */
+  /** This is a public function. Return a memoized UUID-like id unique to this browser session. */
   if (memoSessionId) return memoSessionId;
   memoSessionId = _uuidV4();
   return memoSessionId;
@@ -82,6 +82,7 @@ export function getSessionId(): string {
 // PUBLIC_INTERFACE
 export function logAction<TState = unknown>(entry: PartialAuditEntry<TState>): AuditEntry<TState> {
   /**
+   * This is a public function.
    * Log an action to console and keep in-memory record for the session.
    * Automatically adds sessionId and unique id to the entry.
    * Enforces ERROR entries to include a non-empty message.
@@ -102,13 +103,13 @@ export function logAction<TState = unknown>(entry: PartialAuditEntry<TState>): A
 
 // PUBLIC_INTERFACE
 export function getAuditTrail(): AuditEntry[] {
-  /** Retrieve the current in-memory audit trail (copy). */
+  /** This is a public function. Retrieve the current in-memory audit trail (copy). */
   return [...trail];
 }
 
 // PUBLIC_INTERFACE
 export function clearAuditTrail(): void {
-  /** Clear the audit trail - useful for tests or resetting state. */
+  /** This is a public function. Clear the audit trail - useful for tests or resetting state. */
   trail.length = 0;
 }
 
@@ -118,7 +119,7 @@ export function clearAuditTrail(): void {
  * Returns true for all checks in this demo.
  */
 export function hasPermission(_userId: string, _action: AuditAction): boolean {
-  /** RBAC stub — always returns true in this demo. */
+  /** This is a public function. RBAC stub — always returns true in this demo. */
   return true;
 }
 
@@ -128,6 +129,6 @@ export function hasPermission(_userId: string, _action: AuditAction): boolean {
  * No-op that returns a pseudo-signature reference in this demo.
  */
 export async function captureESignature(_userId: string, _reason: string): Promise<{ signatureId: string }> {
-  /** E-signature stub — returns a generated id without user interaction. */
+  /** This is a public function. E-signature stub — returns a generated id without user interaction. */
   return { signatureId: generateId() };
 }
