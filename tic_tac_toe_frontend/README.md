@@ -1,82 +1,46 @@
-# Lightweight React Template for KAVIA
+# Tic Tac Toe — Ocean Professional
 
-This project provides a minimal React template with a clean, modern UI and minimal dependencies.
+A modern, responsive, local two‑player Tic Tac Toe game built with React, themed using the “Ocean Professional” palette. Includes move history, undo, reset, and a lightweight audit trail (console + in‑memory).
 
 ## Features
+- Ocean Professional theme (blue primary, subtle grays, amber accent)
+- 3×3 grid with rounded squares, hover/focus states, and subtle shadows
+- Status area: current player, winner, draw, and move count
+- Controls: New Game (reset), Undo Last Move, toggle Move History
+- Validation and user‑friendly error messages
+- Lightweight audit trail: logs PLAY, UNDO, RESET, ERROR to console with timestamp and before/after state
+- Minimal unit tests for core game logic using Jest + RTL environment
 
-- **Lightweight**: No heavy UI frameworks - uses only vanilla CSS and React
-- **Modern UI**: Clean, responsive design with KAVIA brand styling
-- **Fast**: Minimal dependencies for quick loading times
-- **Simple**: Easy to understand and modify
+## Run
+- Install and start with the standard CRA commands:
+  - npm install
+  - npm start
+- App runs at http://localhost:3000
 
-## Getting Started
+## Test
+- npm test
 
-In the project directory, you can run:
+## Structure (key files)
+- src/theme.ts — theme constants and cx utility
+- src/utils/audit.ts — lightweight audit trail utilities
+- src/utils/validators.ts — reusable validation functions
+- src/game/logic.ts — pure game logic and GameState
+- src/components/Square.tsx — accessible square button
+- src/components/Board.tsx — 3×3 board grid
+- src/App.tsx — main app, state mgmt, handlers, UI
+- src/__tests__/logic.test.ts — unit tests for core logic
 
-### `npm start`
+## GxP‑Inspired Notes
+- Data integrity: audit logs include user (Player X/O), ISO timestamps, action, before/after state, and payload where relevant.
+- Contemporaneous logging: actions are logged immediately upon execution.
+- Documentation: functions include comments; public functions are annotated as PUBLIC_INTERFACE.
+- This demo is frontend‑only (no persistence, no auth), so audit logs are illustrative and scoped to the browser session.
 
-Runs the app in development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Accessibility
+- Keyboard accessible buttons
+- aria‑labels for squares and controls
+- aria‑live regions for status and message updates
 
-### `npm test`
-
-Launches the test runner in interactive watch mode.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-## Customization
-
-### Colors
-
-The main brand colors are defined as CSS variables in `src/App.css`:
-
-```css
-:root {
-  --kavia-orange: #E87A41;
-  --kavia-dark: #1A1A1A;
-  --text-color: #ffffff;
-  --text-secondary: rgba(255, 255, 255, 0.7);
-  --border-color: rgba(255, 255, 255, 0.1);
-}
-```
-
-### Components
-
-This template uses pure HTML/CSS components instead of a UI framework. You can find component styles in `src/App.css`. 
-
-Common components include:
-- Buttons (`.btn`, `.btn-large`)
-- Container (`.container`)
-- Navigation (`.navbar`)
-- Typography (`.title`, `.subtitle`, `.description`)
-
-## Learn More
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+## Styling
+- Modern minimalist UI with subtle gradient background and surface cards
+- Smooth hover/focus transitions and consistent spacing
