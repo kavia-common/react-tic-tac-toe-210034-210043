@@ -12,6 +12,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "test:coverage": "cross-env CI=true react-scripts test --watchAll=false --coverage",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {

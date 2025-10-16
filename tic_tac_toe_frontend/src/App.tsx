@@ -27,7 +27,7 @@ type Toast = { type: "error" | "info"; message: string } | null;
 function useGame(): {
   state: GameState;
   handlePlay: (index: number) => void;
-  handleReset: () => void;
+  handleReset: (reason?: string) => void;
   handleUndo: () => void;
 } {
   const [board, setBoard] = useState(createEmptyBoard());

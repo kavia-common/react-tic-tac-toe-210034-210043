@@ -18,12 +18,13 @@
 // ============================================================================
 
 import { assertCellEmpty, assertValidIndex, assertValidPlayer, Player } from "../utils/validators";
+import type { SquareValue } from "../components/Square";
 
 // ============================================================================
 // FEATURE IMPLEMENTATION
 // ============================================================================
 
-export type Board = string[]; // 9 cells, "" | "X" | "O"
+export type Board = SquareValue[]; // 9 cells, "" | "X" | "O"
 
 // PUBLIC_INTERFACE
 export function createEmptyBoard(): Board {

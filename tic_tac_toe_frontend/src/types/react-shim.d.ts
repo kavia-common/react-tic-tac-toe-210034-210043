@@ -7,6 +7,21 @@ declare module "react" {
   export interface MutableRefObject<T> { current: T | null; }
   export type Ref<T> = ((instance: T | null) => void) | MutableRefObject<T> | null;
 
+  export interface SyntheticEvent<T = Element, E = Event> {
+    nativeEvent: E;
+    currentTarget: T;
+    target: T;
+    preventDefault(): void;
+    stopPropagation(): void;
+  }
+  export interface KeyboardEvent<T = Element> extends SyntheticEvent<T, any> {
+    altKey: boolean;
+    ctrlKey: boolean;
+    shiftKey: boolean;
+    metaKey: boolean;
+    key: string;
+  }
+
   export function createElement(type: any, props?: any, ...children: any[]): any;
 
   export function useState<S>(initialState: S | (() => S)): [S, (value: S | ((prev: S) => S)) => void];
@@ -23,6 +38,9 @@ declare module "react" {
     StrictMode: typeof StrictMode;
   };
   export default ReactDefault;
+
+  // Also export a namespace-like object for React.* references in types (e.g., React.Ref)
+  export as namespace React;
 }
 
 // Provide the JSX namespace so TSX elements are typed.
@@ -37,6 +55,27 @@ declare global {
     // Accept any intrinsic HTML tag to keep shim minimal
     interface IntrinsicElements {
       [elemName: string]: any;
+    }
+  }
+
+  // Provide a global React namespace type mapping for references like React.Ref<...>
+  namespace React {
+    type ReactNode = any;
+    interface MutableRefObject<T> { current: T | null; }
+    type Ref<T> = ((instance: T | null) => void) | MutableRefObject<T> | null;
+    interface SyntheticEvent<T = Element, E = Event> {
+      nativeEvent: E;
+      currentTarget: T;
+      target: T;
+      preventDefault(): void;
+      stopPropagation(): void;
+    }
+    interface KeyboardEvent<T = Element> extends SyntheticEvent<T, any> {
+      altKey: boolean;
+      ctrlKey: boolean;
+      shiftKey: boolean;
+      metaKey: boolean;
+      key: string;
     }
   }
 }

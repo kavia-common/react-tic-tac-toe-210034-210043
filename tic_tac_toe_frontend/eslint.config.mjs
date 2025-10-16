@@ -6,10 +6,11 @@ import pluginReact from "eslint-plugin-react";
  * - Covers JS/TS/JSX/TSX files
  * - Keeps rules light to avoid conflicts with CRA/Jest setup
  * - Enables React JSX usage rules and disables legacy React-in-scope requirements
+ * - Recognizes Jest/RTL globals to reduce false positives
  * Note: We do NOT bring in heavy TypeScript rulesets to avoid churn.
  */
 export default [
-  // Set file globs for both JS and TS
+  // Apply to all source files including TS/TSX
   { files: ["**/*.{js,mjs,cjs,jsx,ts,tsx}"] },
   {
     languageOptions: {
@@ -18,17 +19,30 @@ export default [
         sourceType: "module",
         ecmaFeatures: { jsx: true }
       },
+      // Keep a minimal globals set to avoid noisy errors in tests and browser code
       globals: {
         document: true,
         window: true,
+        navigator: true,
+        console: true,
+        // Jest globals
+        describe: true,
         test: true,
+        it: true,
         expect: true,
+        beforeAll: true,
+        beforeEach: true,
+        afterAll: true,
+        afterEach: true,
         jest: true
       }
     },
     rules: {
-      // Keep unused-vars strict but avoid noise around React symbol
-      "no-unused-vars": ["error", { varsIgnorePattern: "React|App", args: "none", ignoreRestSiblings: true }]
+      // Keep unused-vars strict but avoid noise around React symbol, allow underscore args
+      "no-unused-vars": [
+        "error",
+        { varsIgnorePattern: "React|App", args: "none", ignoreRestSiblings: true, caughtErrors: "none" }
+      ]
     }
   },
   // Base JS recommended
@@ -46,5 +60,9 @@ export default [
         version: "detect"
       }
     }
+  },
+  // Ignore config for build outputs and lock files if any appear
+  {
+    ignores: ["build/**", "node_modules/**", "coverage/**"]
   }
 ];
